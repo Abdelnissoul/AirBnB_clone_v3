@@ -17,13 +17,15 @@ classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
 
 
 class FileStorage:
-    """Serializes instances to a JSON file & deserializes back to instances"""
+    """instances to a JSON file & deserializes back to instances"""
 
+    # string - path to the JSON file
     __file_path = "file.json"
+    # dictionary - empty but will store all objects by <class name>.id
     __objects = {}
 
     def all(self, cls=None):
-        """Returns the dictionary __objects"""
+        """returns the dictionary __objects"""
         if cls is not None:
             new_dict = {}
             for key, value in self.__objects.items():
@@ -33,13 +35,13 @@ class FileStorage:
         return self.__objects
 
     def new(self, obj):
-        """Sets in __objects the obj with key <obj class name>.id"""
+        """sets in objects the obj with a key """
         if obj is not None:
             key = obj.__class__.__name__ + "." + obj.id
             self.__objects[key] = obj
 
     def save(self):
-        """Serializes __objects to the JSON file (path: __file_path)"""
+        """saving objects to the JSON file (path: __file_path)"""
         json_objects = {}
         for key in self.__objects:
             json_objects[key] = self.__objects[key].to_dict()
@@ -47,7 +49,7 @@ class FileStorage:
             json.dump(json_objects, f)
 
     def reload(self):
-        """Deserializes the JSON file to __objects"""
+        """reload the JSON file to __objects"""
         try:
             with open(self.__file_path, 'r') as f:
                 jo = json.load(f)
@@ -57,43 +59,38 @@ class FileStorage:
             pass
 
     def delete(self, obj=None):
-        """Deletes obj from __objects if it’s inside"""
+        """deleting obj from __objects if it’s inside"""
         if obj is not None:
             key = obj.__class__.__name__ + '.' + obj.id
             if key in self.__objects:
                 del self.__objects[key]
 
     def close(self):
-        """Call reload() method for deserializing the JSON file to objects"""
+        """closing the JSON file to objects"""
         self.reload()
 
     def get(self, cls, id):
         """
-        Retrieves an object by class and ID
-
-        Args:
-            cls: class of the object
-            id: ID of the object
-
-        Returns:
-            The object based on the class and its ID, or None if not found
+        gets the object of a class or all objects of that class
         """
-        if cls is None or id is None:
-            return None
-        key = "{}.{}".format(cls.__name__, id)
-        return self.__objects.get(key, None)
+        if id and isinstance(id, str):
+            if cls and (cls in classes.keys() or cls in classes.values()):
+                all_objs = self.all(cls)
+                for key, value in all_objs.items():
+                    if id == value.id and key.split('.')[1] == id:
+                        return value
+        return
 
     def count(self, cls=None):
         """
-        Counts the number of objects in storage matching the given class
-
-        Args:
-            cls: class (optional)
-
-        Returns:
-            The number of objects in storage matching the given class. 
-            If no class is passed, returns the count of all objects in storage.
+        gives the occurrence of a class or all classes
         """
-        if cls is None:
-            return len(self.__objects)
-        return len([obj for obj in self.__objects.values() if isinstance(obj, cls)])
+        occurrence = 0
+        if cls:
+            if cls in classes.keys() or cls in classes.values():
+                occurrence = len(self.all(cls))
+            else:
+                return occurrence
+        if not cls:
+            occurrence = len(self.all())
+        return occurrence
