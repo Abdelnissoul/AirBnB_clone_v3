@@ -5,7 +5,7 @@ It takes the modules from state and storage
 """
 from flask import jsonify, abort, request
 from api.v1.views import app_views
-from models import storage, State
+from models import storage, state
 
 
 @app_views.route('/api/v1/states', methods=['GET'], strict_slashes=False)
