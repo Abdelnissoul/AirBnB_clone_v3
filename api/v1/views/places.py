@@ -28,28 +28,40 @@ def get_place(place_id):
     return jsonify(place.to_dict())
 
 
-@app_views.route('/api/v1/cities/<city_id>/places', methods=['POST'],
+@app_views.route('/api/v1/places_search', methods=['POST'],
                  strict_slashes=False)
-def create_place(city_id):
-    """Create a Place."""
-    city = storage.get(city, city_id)
-    if city is None:
-        abort(404)
-    data = request.get_json()
-    if not data:
+def places_search():
+    """Search for places based on JSON request body."""
+    if not request.json:
         abort(400, 'Not a JSON')
-    if 'user_id' not in data:
-        abort(400, 'Missing user_id')
-    if 'name' not in data:
-        abort(400, 'Missing name')
-    user_id = data['user_id']
-    user = storage.get(user, user_id)
-    if user is None:
-        abort(404)
-    data['city_id'] = city_id
-    place = place(**data)
-    place.save()
-    return jsonify(place.to_dict()), 201
+    data = request.get_json()
+    states = data.get('states', [])
+    cities = data.get('cities', [])
+    amenities = data.get('amenities', [])
+
+    if not states and not cities and not amenities:
+        places = storage.all(Place).values()
+        return jsonify([place.to_dict() for place in places])
+
+    places = set()
+    for state_id in states:
+        state = storage.get(State, state_id)
+        if state:
+            places.update(state.places)
+    for city_id in cities:
+        city = storage.get(City, city_id)
+        if city:
+            places.update(city.places)
+
+    if amenities:
+        filtered_places = []
+        for place in places:
+            place_amenities = {amenity.id for amenity in place.amenities}
+            if set(amenities).issubset(place_amenities):
+                filtered_places.append(place)
+        places = filtered_places
+
+    return jsonify([place.to_dict() for place in places])
 
 
 @app_views.route('/api/v1/places/<place_id>', methods=['PUT'],
