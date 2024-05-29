@@ -11,7 +11,7 @@ from models import storage, state
 @app_views.route('/api/v1/states', methods=['GET'], strict_slashes=False)
 def get_states():
     """Retrieve the list of all State objects."""
-    states = [state.to_dict() for state in storage.all(State).values()]
+    states = [state.to_dict() for state in storage.all(state).values()]
     return jsonify(states)
 
 
@@ -19,7 +19,7 @@ def get_states():
                  strict_slashes=False)
 def get_state(state_id):
     """Retrieve a State object."""
-    state = storage.get(State, state_id)
+    state = storage.get(state, state_id)
     if state is None:
         abort(404)
     return jsonify(state.to_dict())
@@ -33,7 +33,7 @@ def create_state():
         abort(400, 'Not a JSON')
     if 'name' not in data:
         abort(400, 'Missing name')
-    state = State(**data)
+    state = state(**data)
     state.save()
     return jsonify(state.to_dict()), 201
 
@@ -42,7 +42,7 @@ def create_state():
                  strict_slashes=False)
 def update_state(state_id):
     """Update a State object."""
-    state = storage.get(State, state_id)
+    state = storage.get(state, state_id)
     if state is None:
         abort(404)
     data = request.get_json()
@@ -59,7 +59,7 @@ def update_state(state_id):
                  strict_slashes=False)
 def delete_state(state_id):
     """Delete a State object."""
-    state = storage.get(State, state_id)
+    state = storage.get(state, state_id)
     if state is None:
         abort(404)
     state.delete()

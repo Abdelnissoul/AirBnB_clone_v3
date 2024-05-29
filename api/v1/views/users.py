@@ -10,7 +10,7 @@ from models import storage, user
 @app_views.route('/api/v1/users', methods=['GET'], strict_slashes=False)
 def get_users():
     """Retrieve the list of all User objects."""
-    users = [user.to_dict() for user in storage.all(User).values()]
+    users = [user.to_dict() for user in storage.all(user).values()]
     return jsonify(users)
 
 
@@ -18,7 +18,7 @@ def get_users():
                  strict_slashes=False)
 def get_user(user_id):
     """Retrieve a User object."""
-    user = storage.get(User, user_id)
+    user = storage.get(user, user_id)
     if user is None:
         abort(404)
     return jsonify(user.to_dict())
@@ -34,7 +34,7 @@ def create_user():
         abort(400, 'Missing email')
     if 'password' not in data:
         abort(400, 'Missing password')
-    user = User(**data)
+    user = user(**data)
     user.save()
     return jsonify(user.to_dict()), 201
 
@@ -43,7 +43,7 @@ def create_user():
                  strict_slashes=False)
 def update_user(user_id):
     """Update a User object."""
-    user = storage.get(User, user_id)
+    user = storage.get(user, user_id)
     if user is None:
         abort(404)
     data = request.get_json()
@@ -60,7 +60,7 @@ def update_user(user_id):
                  strict_slashes=False)
 def delete_user(user_id):
     """Delete a User object."""
-    user = storage.get(User, user_id)
+    user = storage.get(user, user_id)
     if user is None:
         abort(404)
     user.delete()

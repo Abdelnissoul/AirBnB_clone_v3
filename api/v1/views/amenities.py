@@ -10,7 +10,7 @@ from models import storage, amenity
 @app_views.route('/api/v1/amenities', methods=['GET'], strict_slashes=False)
 def get_amenities():
     """Retrieve the list of all Amenity objects."""
-    amenities = [amenity.to_dict() for amenity in storage.all(Amenity).values()]
+    amenities = [amenity.to_dict() for amenity in storage.all(amenity).values()]
     return jsonify(amenities)
 
 
@@ -18,7 +18,7 @@ def get_amenities():
                  strict_slashes=False)
 def get_amenity(amenity_id):
     """Retrieve a Amenity object."""
-    amenity = storage.get(Amenity, amenity_id)
+    amenity = storage.get(amenity, amenity_id)
     if amenity is None:
         abort(404)
     return jsonify(amenity.to_dict())
@@ -32,7 +32,7 @@ def create_amenity():
         abort(400, 'Not a JSON')
     if 'name' not in data:
         abort(400, 'Missing name')
-    amenity = Amenity(**data)
+    amenity = amenity(**data)
     amenity.save()
     return jsonify(amenity.to_dict()), 201
 
@@ -41,7 +41,7 @@ def create_amenity():
                  strict_slashes=False)
 def update_amenity(amenity_id):
     """Update a Amenity object."""
-    amenity = storage.get(Amenity, amenity_id)
+    amenity = storage.get(amenity, amenity_id)
     if amenity is None:
         abort(404)
     data = request.get_json()
@@ -58,7 +58,7 @@ def update_amenity(amenity_id):
                  strict_slashes=False)
 def delete_amenity(amenity_id):
     """Delete a Amenity object."""
-    amenity = storage.get(Amenity, amenity_id)
+    amenity = storage.get(amenity, amenity_id)
     if amenity is None:
         abort(404)
     amenity.delete()
