@@ -1,5 +1,8 @@
 #!/usr/bin/python3
-"""Module containing states views."""
+"""
+Module containing states views.
+It takes the modules from state and storage 
+"""
 from flask import jsonify, abort, request
 from api.v1.views import app_views
 from models import storage, State
